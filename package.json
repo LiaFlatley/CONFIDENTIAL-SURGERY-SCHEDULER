@@ -1,0 +1,45 @@
+{
+  "name": "confidential-surgery-scheduler",
+  "version": "1.0.0",
+  "description": "A confidential surgery appointment scheduling dApp using FHE technology for privacy-preserving medical data",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx http-server public -p 8080 -c-1 --cors",
+    "start": "npx http-server public -p 8080 -c-1 --cors",
+    "compile": "npx hardhat compile",
+    "deploy": "npx hardhat run scripts/deploy.js --network sepolia",
+    "test": "npx hardhat test"
+  },
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "fhe",
+    "privacy",
+    "medical",
+    "healthcare",
+    "surgery",
+    "scheduling",
+    "zama",
+    "fhevm"
+  ],
+  "author": "Medical Privacy Solutions",
+  "license": "MIT",
+  "dependencies": {
+    "@fhevm/solidity": "^0.3.0",
+    "ethers": "^5.7.2",
+    "fhevm": "^0.3.1"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.0",
+    "http-server": "^14.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/medical-privacy/confidential-surgery-scheduler"
+  },
+  "bugs": {
+    "url": "https://github.com/medical-privacy/confidential-surgery-scheduler/issues"
+  },
+  "homepage": "https://github.com/medical-privacy/confidential-surgery-scheduler#readme"
+}
