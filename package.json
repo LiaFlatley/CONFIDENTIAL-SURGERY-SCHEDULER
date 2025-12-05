@@ -1,45 +1,70 @@
 {
-  "name": "confidential-surgery-scheduler",
+  "name": "fhevm-confidential-surgery-scheduler",
   "version": "1.0.0",
-  "description": "A confidential surgery appointment scheduling dApp using FHE technology for privacy-preserving medical data",
+  "description": "Privacy-preserving surgery appointment scheduling system using FHEVM - A Zama Bounty Track Example",
   "main": "index.js",
   "scripts": {
-    "dev": "npx http-server public -p 8080 -c-1 --cors",
-    "start": "npx http-server public -p 8080 -c-1 --cors",
-    "compile": "npx hardhat compile",
-    "deploy": "npx hardhat run scripts/deploy.js --network sepolia",
-    "test": "npx hardhat test"
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy": "hardhat run scripts/deploy.ts",
+    "deploy:sepolia": "hardhat run scripts/deploy.ts --network sepolia",
+    "deploy:zama": "hardhat run scripts/deploy.ts --network zamaDevnet",
+    "interact": "hardhat run scripts/interact.ts",
+    "clean": "hardhat clean",
+    "typechain": "hardhat typechain",
+    "coverage": "hardhat coverage",
+    "gas-report": "REPORT_GAS=true hardhat test"
   },
   "keywords": [
+    "fhevm",
+    "fhe",
+    "fully-homomorphic-encryption",
+    "privacy",
     "blockchain",
     "ethereum",
-    "fhe",
-    "privacy",
-    "medical",
-    "healthcare",
-    "surgery",
-    "scheduling",
     "zama",
-    "fhevm"
+    "confidential-computing",
+    "healthcare",
+    "surgery-scheduling",
+    "medical-privacy",
+    "encrypted-data",
+    "smart-contracts",
+    "bounty-track"
   ],
-  "author": "Medical Privacy Solutions",
+  "author": "Healthcare Privacy Solutions",
   "license": "MIT",
   "dependencies": {
     "@fhevm/solidity": "^0.3.0",
-    "ethers": "^5.7.2",
+    "ethers": "^6.9.0",
     "fhevm": "^0.3.1"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
+    "@nomicfoundation/hardhat-ethers": "^3.0.0",
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@typechain/ethers-v6": "^0.5.0",
+    "@typechain/hardhat": "^9.0.0",
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^20.0.0",
+    "chai": "^4.3.0",
     "hardhat": "^2.19.0",
-    "http-server": "^14.1.1"
+    "hardhat-gas-reporter": "^1.0.0",
+    "solidity-coverage": "^0.8.0",
+    "ts-node": "^10.9.0",
+    "typechain": "^8.3.0",
+    "typescript": "^5.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/medical-privacy/confidential-surgery-scheduler"
+    "url": "https://github.com/healthcare-privacy/fhevm-surgery-scheduler"
   },
   "bugs": {
-    "url": "https://github.com/medical-privacy/confidential-surgery-scheduler/issues"
+    "url": "https://github.com/healthcare-privacy/fhevm-surgery-scheduler/issues"
   },
-  "homepage": "https://github.com/medical-privacy/confidential-surgery-scheduler#readme"
+  "homepage": "https://github.com/healthcare-privacy/fhevm-surgery-scheduler#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
 }
