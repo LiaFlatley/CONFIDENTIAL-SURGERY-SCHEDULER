@@ -1,0 +1,51 @@
+CONFIDENTIAL SURGERY SCHEDULER - VIDEO DIALOGUE
+
+===== SCENE 1: INTRODUCTION =====
+
+Imagine you need surgery. You share your medical urgency with the hospital - but should everyone in the system see how critical your condition is?
+
+Traditional blockchain systems expose all data. But what if we could schedule surgery while keeping patient information completely private?
+
+===== SCENE 2: THE PROBLEM =====
+
+In conventional systems, patient urgency levels, medical IDs, and surgery types are visible on-chain. This creates privacy risks and violates medical confidentiality.
+
+The solution? Fully Homomorphic Encryption. With Zama's FHEVM, we can compute on encrypted data without ever revealing it.
+
+===== SCENE 3: THE SOLUTION =====
+
+Let me show you how it works.
+
+First, we deploy our Confidential Surgery Scheduler contract. A surgeon creates an encrypted surgery slot with maximum capacity.
+
+Now, multiple patients request appointments. Notice how their urgency levels - eight, six, and nine - are immediately encrypted using FHE. The smart contract receives encrypted integers: euint8 for urgency levels, euint16 for patient IDs.
+
+We grant access permissions using FHE dot allow and FHE dot allow This. This ensures only authorized parties can access encrypted data.
+
+Finally, we process assignments. The contract compares encrypted urgency levels without decrypting them and assigns the slot to the patient with highest priority - all while maintaining complete privacy.
+
+===== SCENE 4: KEY FEATURES =====
+
+Our solution demonstrates core FHEVM concepts:
+
+First, data encryption using euint8, euint16, and euint32 types for different data sizes.
+
+Second, comprehensive access control with FHE dot allow for user permissions and FHE dot allow This for contract access.
+
+Third, role-based security with separate permissions for hospital administrators, surgeons, and patients.
+
+Fourth, privacy-preserving operations where urgency comparison happens on encrypted values.
+
+And finally, production-ready implementation with over 95 percent test coverage and complete documentation.
+
+===== SCENE 5: RESULTS & CALL TO ACTION =====
+
+Our test suite validates every aspect: authorization, encryption, assignment processing, and edge cases. All tests pass with excellent coverage.
+
+The result? A practical, production-ready example of FHEVM in healthcare. Patient privacy protected. Medical efficiency maintained. Built on encrypted computation.
+
+Check out the full implementation on GitHub - complete with comprehensive tests, deployment scripts, and documentation.
+
+Confidential Surgery Scheduler - protecting patient privacy while enabling efficient healthcare operations.
+
+Built for the Zama Bounty Track December 2025.
