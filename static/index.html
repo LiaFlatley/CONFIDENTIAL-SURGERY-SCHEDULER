@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confidential Surgery Scheduler | Secure Medical Appointment System</title>
+    <meta name="description" content="Secure and private medical appointment scheduling system using Fully Homomorphic Encryption (FHE) technology for confidential surgery scheduling.">
+    <meta name="keywords" content="medical scheduling, surgery appointments, blockchain healthcare, FHE encryption, privacy healthcare">
+    <meta name="author" content="Medical Privacy Solutions">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Confidential Surgery Scheduler">
+    <meta property="og:description" content="Secure medical appointment scheduling using FHE technology">
+    <meta property="og:type" content="website">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🏥%3C/text%3E%3C/svg%3E">
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script>
+        // Fallback loading for ethers.js
+        if (typeof ethers === 'undefined') {
+            console.log('Loading ethers.js fallback...');
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js';
+            script.onerror = function() {
+                console.error('Failed to load ethers.js from all CDNs');
+                document.getElementById('alerts').innerHTML = '<div class="alert alert-error">Failed to load ethers.js library. Please check your internet connection.</div>';
+            };
+            document.head.appendChild(script);
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .card h3 {
+            color: #4f46e5;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4);
+        }
+
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .status-card h3 {
+            color: white;
+            border-bottom-color: rgba(255,255,255,0.3);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .info-item h4 {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+
+        .info-item p {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            color: white;
+            z-index: 1000;
+        }
+
+        .connected {
+            background: #10b981;
+        }
+
+        .disconnected {
+            background: #ef4444;
+        }
+
+        .alert {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        .urgency-scale {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .history-item {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4f46e5;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .network-info {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .contract-input {
+            margin-bottom: 15px;
+        }
+
+        .contract-input input {
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="connection-status" id="connectionStatus">
+        <span id="connectionText">Disconnected</span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Confidential Surgery Scheduler</h1>
+            <p>Secure and private medical appointment scheduling using FHE technology</p>
+        </div>
+
+        <div id="alerts"></div>
+
+        <div class="dashboard">
+            <!-- Connection and Status Card -->
+            <div class="card status-card">
+                <h3>📊 System Status</h3>
+
+                <div class="contract-input">
+                    <label for="contractAddress">Contract Address</label>
+                    <input type="text" id="contractAddress" value="0x24D1C780B5E2F91de5B97d86836497fd7259DE46" placeholder="Enter contract address (0x...)">
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <h4>Current Hour</h4>
+                        <p id="currentHour">--</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Slot ID</h4>
+                        <p id="currentSlotId">--</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Requests</h4>
+                        <p id="requestCount">--</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Capacity</h4>
+                        <p id="slotCapacity">--</p>
+                    </div>
+                </div>
+
+                <div class="network-info">
+                    <strong>Network:</strong> <span id="networkName">Not connected</span><br>
+                    <strong>Account:</strong> <span id="accountAddress">Not connected</span>
+                </div>
+
+                <button onclick="connectWallet()" id="connectBtn">Connect Wallet</button>
+                <button onclick="loadContractInfo()" id="refreshBtn" class="hidden">Refresh Status</button>
+            </div>
+
+            <!-- Admin Panel -->
+            <div class="card" id="adminPanel" style="display: none;">
+                <h3>👨‍⚕️ Surgeon Panel</h3>
+                <div class="form-group">
+                    <label for="surgeonId">Surgeon ID</label>
+                    <input type="number" id="surgeonId" min="1" max="100" value="1">
+                </div>
+                <div class="form-group">
+                    <label for="scheduleTime">Schedule Time (Unix timestamp)</label>
+                    <input type="number" id="scheduleTime" placeholder="Enter Unix timestamp">
+                    <small style="color: #6b7280; font-size: 0.8rem;">
+                        Current timestamp: <span id="currentTimestamp"></span>
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label for="maxCapacity">Maximum Capacity</label>
+                    <input type="number" id="maxCapacity" min="1" max="10" value="3">
+                </div>
+                <button onclick="createSurgerySlot()" id="createSlotBtn">Create Surgery Slot</button>
+
+                <div style="margin-top: 20px;">
+                    <button onclick="processAssignments()" id="processBtn">Process Assignments</button>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <h4>Authorization Management</h4>
+                    <div class="form-group">
+                        <label for="authAddress">Address to Authorize</label>
+                        <input type="text" id="authAddress" placeholder="0x...">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="authorizePatient()" style="flex: 1;">Authorize Patient</button>
+                        <button onclick="authorizeSurgeon()" style="flex: 1;">Authorize Surgeon</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Patient Panel -->
+            <div class="card" id="patientPanel" style="display: none;">
+                <h3>🤒 Patient Request Panel</h3>
+                <div class="form-group">
+                    <label for="patientId">Patient ID</label>
+                    <input type="number" id="patientId" min="1" max="9999" placeholder="Your patient ID">
+                </div>
+                <div class="form-group">
+                    <label for="urgencyLevel">Urgency Level (1-10)</label>
+                    <input type="range" id="urgencyLevel" min="1" max="10" value="5">
+                    <div class="urgency-scale">
+                        <span>1 (Low)</span>
+                        <span id="urgencyValue">5</span>
+                        <span>10 (Critical)</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="surgeryType">Surgery Type</label>
+                    <select id="surgeryType">
+                        <option value="1">General Surgery</option>
+                        <option value="2">Cardiac Surgery</option>
+                        <option value="3">Orthopedic Surgery</option>
+                        <option value="4">Neurosurgery</option>
+                        <option value="5">Plastic Surgery</option>
+                        <option value="6">Emergency Surgery</option>
+                        <option value="7">Outpatient Procedure</option>
+                        <option value="8">Diagnostic Surgery</option>
+                        <option value="9">Pediatric Surgery</option>
+                        <option value="10">Ophthalmology</option>
+                        <option value="11">Dermatology</option>
+                        <option value="12">Urology</option>
+                        <option value="13">Gynecology</option>
+                        <option value="14">ENT Surgery</option>
+                        <option value="15">Vascular Surgery</option>
+                        <option value="16">Thoracic Surgery</option>
+                        <option value="17">Transplant Surgery</option>
+                        <option value="18">Bariatric Surgery</option>
+                        <option value="19">Trauma Surgery</option>
+                        <option value="20">Reconstructive Surgery</option>
+                    </select>
+                </div>
+                <button onclick="requestAppointment()" id="requestBtn">Request Appointment</button>
+
+                <div style="margin-top: 20px;">
+                    <h4>Your Request Status</h4>
+                    <p id="requestStatus">No active request</p>
+                </div>
+            </div>
+
+            <!-- Information Panel -->
+            <div class="card">
+                <h3>ℹ️ How It Works</h3>
+                <div style="line-height: 1.6;">
+                    <p><strong>Business Hours:</strong> 8:00 AM - 6:00 PM</p>
+                    <p><strong>Assignment Times:</strong> 9:00 AM, 1:00 PM, 5:00 PM</p>
+                    <br>
+                    <p><strong>For Surgeons:</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>Create surgery slots during business hours</li>
+                        <li>Set capacity and schedule parameters</li>
+                        <li>Process assignments at designated times</li>
+                        <li>Authorize patients and other surgeons</li>
+                    </ul>
+                    <br>
+                    <p><strong>For Patients:</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>Submit appointment requests during business hours</li>
+                        <li>Provide urgency level and surgery type (encrypted)</li>
+                        <li>Assignments based on medical priority</li>
+                        <li>All patient data is kept confidential using FHE</li>
+                    </ul>
+                    <br>
+                    <p><strong>Privacy Features:</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>Patient IDs, urgency levels, and surgery types are encrypted</li>
+                        <li>Only assignment results are revealed publicly</li>
+                        <li>Confidential computation ensures fair scheduling</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="card">
+            <h3>📋 Appointment History</h3>
+            <div id="historyContainer">
+                <p>Connect wallet and enter contract address to view history...</p>
+            </div>
+            <button onclick="loadHistory()" style="margin-top: 15px;">Refresh History</button>
+        </div>
+    </div>
+
+    <script>
+        // Contract ABI
+        const CONTRACT_ABI = [
+            "function getCurrentSlotInfo() view returns (uint16, bool, bool, uint256, uint256, uint8, uint8)",
+            "function getCurrentHour() view returns (uint256)",
+            "function createSurgerySlot(uint8, uint32, uint8)",
+            "function requestAppointment(uint16, uint8, uint8)",
+            "function processAssignments()",
+            "function authorizePatient(address)",
+            "function authorizeSurgeon(address)",
+            "function getPatientRequestStatus(address) view returns (bool, uint256)",
+            "function getSlotHistory(uint16) view returns (bool, address, uint8, uint256, uint256, uint256)",
+            "function hospitalAdmin() view returns (address)",
+            "function authorizedSurgeons(address) view returns (bool)",
+            "function authorizedPatients(address) view returns (bool)",
+            "function isBusinessHour() view returns (bool)",
+            "function isAssignmentHour() view returns (bool)",
+            "function isBusinessHoursActive() view returns (bool)",
+            "function isAssignmentTimeActive() view returns (bool)",
+            "function emergencyAssignment(uint16, address)",
+            "function getRequestingPatients(uint16) view returns (address[])"
+        ];
+
+        let provider, signer, contract;
+        let userAddress, networkName;
+
+        // Initialize urgency level display
+        document.getElementById('urgencyLevel').addEventListener('input', function() {
+            document.getElementById('urgencyValue').textContent = this.value;
+        });
+
+        // Update current timestamp display every second
+        setInterval(() => {
+            document.getElementById('currentTimestamp').textContent = Math.floor(Date.now() / 1000);
+        }, 1000);
+
+        async function connectWallet() {
+            try {
+                // Check if ethers is loaded
+                if (typeof ethers === 'undefined') {
+                    showAlert('Ethers.js library is not loaded. Please check your internet connection and refresh the page.', 'error');
+                    return;
+                }
+
+                if (typeof window.ethereum !== 'undefined') {
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    signer = provider.getSigner();
+                    userAddress = await signer.getAddress();
+
+                    // Get network information
+                    const network = await provider.getNetwork();
+                    networkName = network.name === 'unknown' ? `Chain ID: ${network.chainId}` : network.name;
+
+                    updateConnectionStatus(true);
+                    showAlert('Wallet connected successfully!', 'success');
+                    document.getElementById('connectBtn').classList.add('hidden');
+                    document.getElementById('refreshBtn').classList.remove('hidden');
+
+                    // Show appropriate panels based on user role
+                    showUserPanels();
+
+                    // Try to initialize contract if address is already filled
+                    const contractAddress = document.getElementById('contractAddress').value;
+                    if (contractAddress && contractAddress.length > 0) {
+                        if (ethers.utils.isAddress(contractAddress)) {
+                            initializeContract(contractAddress);
+                        } else {
+                            showAlert('Invalid contract address format', 'error');
+                        }
+                    }
+                } else {
+                    showAlert('Please install MetaMask!', 'error');
+                }
+            } catch (error) {
+                console.error('Connection failed:', error);
+                showAlert('Failed to connect wallet: ' + error.message, 'error');
+            }
+        }
+
+        function initializeContract(contractAddress) {
+            try {
+                contract = new ethers.Contract(contractAddress, CONTRACT_ABI, signer);
+                loadContractInfo();
+                showAlert('Contract connected successfully!', 'success');
+            } catch (error) {
+                console.error('Contract initialization failed:', error);
+                showAlert('Failed to initialize contract: ' + error.message, 'error');
+            }
+        }
+
+        // Listen for contract address input changes
+        document.getElementById('contractAddress').addEventListener('blur', function() {
+            const address = this.value.trim();
+            if (address && ethers.utils.isAddress(address) && signer) {
+                initializeContract(address);
+            }
+        });
+
+        function updateConnectionStatus(connected) {
+            const statusElement = document.getElementById('connectionStatus');
+            const textElement = document.getElementById('connectionText');
+            const networkElement = document.getElementById('networkName');
+            const accountElement = document.getElementById('accountAddress');
+
+            if (connected) {
+                statusElement.className = 'connection-status connected';
+                textElement.textContent = `Connected`;
+                networkElement.textContent = networkName || 'Unknown';
+                accountElement.textContent = `${userAddress?.substring(0,6)}...${userAddress?.substring(38)}`;
+            } else {
+                statusElement.className = 'connection-status disconnected';
+                textElement.textContent = 'Disconnected';
+                networkElement.textContent = 'Not connected';
+                accountElement.textContent = 'Not connected';
+            }
+        }
+
+        function showUserPanels() {
+            // Show both panels - in a real app, you'd determine user role
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('patientPanel').style.display = 'block';
+        }
+
+        async function loadContractInfo() {
+            if (!contract) {
+                showAlert('Please enter a valid contract address first', 'error');
+                return;
+            }
+
+            try {
+                const slotInfo = await contract.getCurrentSlotInfo();
+                const currentHour = await contract.getCurrentHour();
+
+                document.getElementById('currentHour').textContent = currentHour.toString();
+                document.getElementById('currentSlotId').textContent = slotInfo[0].toString();
+                document.getElementById('requestCount').textContent = slotInfo[4].toString();
+                document.getElementById('slotCapacity').textContent = `${slotInfo[6]}/${slotInfo[5]}`;
+
+                // Update request status for current user
+                if (userAddress) {
+                    const requestStatus = await contract.getPatientRequestStatus(userAddress);
+                    const statusText = requestStatus[0] ?
+                        `Requested at ${new Date(requestStatus[1] * 1000).toLocaleString()}` :
+                        'No active request';
+                    document.getElementById('requestStatus').textContent = statusText;
+                }
+
+            } catch (error) {
+                console.error('Failed to load contract info:', error);
+                showAlert('Failed to load contract information: ' + error.message, 'error');
+            }
+        }
+
+        async function createSurgerySlot() {
+            if (!contract) {
+                showAlert('Please connect wallet and enter contract address', 'error');
+                return;
+            }
+
+            const surgeonId = document.getElementById('surgeonId').value;
+            const scheduleTime = document.getElementById('scheduleTime').value;
+            const maxCapacity = document.getElementById('maxCapacity').value;
+
+            if (!surgeonId || !scheduleTime || !maxCapacity) {
+                showAlert('Please fill all fields', 'error');
+                return;
+            }
+
+            try {
+                showAlert('Creating surgery slot...', 'info');
+                const tx = await contract.createSurgerySlot(surgeonId, scheduleTime, maxCapacity);
+                showAlert('Transaction submitted. Waiting for confirmation...', 'info');
+                await tx.wait();
+                showAlert('Surgery slot created successfully!', 'success');
+                loadContractInfo();
+            } catch (error) {
+                console.error('Failed to create slot:', error);
+                showAlert('Failed to create slot: ' + error.message, 'error');
+            }
+        }
+
+        async function requestAppointment() {
+            if (!contract) {
+                showAlert('Please connect wallet and enter contract address', 'error');
+                return;
+            }
+
+            const patientId = document.getElementById('patientId').value;
+            const urgencyLevel = document.getElementById('urgencyLevel').value;
+            const surgeryType = document.getElementById('surgeryType').value;
+
+            if (!patientId) {
+                showAlert('Please enter your patient ID', 'error');
+                return;
+            }
+
+            try {
+                showAlert('Submitting appointment request...', 'info');
+                const tx = await contract.requestAppointment(patientId, urgencyLevel, surgeryType);
+                showAlert('Transaction submitted. Waiting for confirmation...', 'info');
+                await tx.wait();
+                showAlert('Appointment request submitted successfully!', 'success');
+                loadContractInfo();
+            } catch (error) {
+                console.error('Failed to request appointment:', error);
+                showAlert('Failed to request appointment: ' + error.message, 'error');
+            }
+        }
+
+        async function processAssignments() {
+            if (!contract) {
+                showAlert('Please connect wallet and enter contract address', 'error');
+                return;
+            }
+
+            try {
+                showAlert('Processing assignments...', 'info');
+                const tx = await contract.processAssignments();
+                showAlert('Transaction submitted. Waiting for confirmation...', 'info');
+                await tx.wait();
+                showAlert('Assignments processed successfully!', 'success');
+                loadContractInfo();
+                loadHistory();
+            } catch (error) {
+                console.error('Failed to process assignments:', error);
+                showAlert('Failed to process assignments: ' + error.message, 'error');
+            }
+        }
+
+        async function authorizePatient() {
+            if (!contract) {
+                showAlert('Please connect wallet and enter contract address', 'error');
+                return;
+            }
+
+            const address = document.getElementById('authAddress').value;
+            if (!address || !ethers.utils.isAddress(address)) {
+                showAlert('Please enter a valid address', 'error');
+                return;
+            }
+
+            try {
+                showAlert('Authorizing patient...', 'info');
+                const tx = await contract.authorizePatient(address);
+                showAlert('Transaction submitted. Waiting for confirmation...', 'info');
+                await tx.wait();
+                showAlert('Patient authorized successfully!', 'success');
+                document.getElementById('authAddress').value = '';
+            } catch (error) {
+                console.error('Failed to authorize patient:', error);
+                showAlert('Failed to authorize patient: ' + error.message, 'error');
+            }
+        }
+
+        async function authorizeSurgeon() {
+            if (!contract) {
+                showAlert('Please connect wallet and enter contract address', 'error');
+                return;
+            }
+
+            const address = document.getElementById('authAddress').value;
+            if (!address || !ethers.utils.isAddress(address)) {
+                showAlert('Please enter a valid address', 'error');
+                return;
+            }
+
+            try {
+                showAlert('Authorizing surgeon...', 'info');
+                const tx = await contract.authorizeSurgeon(address);
+                showAlert('Transaction submitted. Waiting for confirmation...', 'info');
+                await tx.wait();
+                showAlert('Surgeon authorized successfully!', 'success');
+                document.getElementById('authAddress').value = '';
+            } catch (error) {
+                console.error('Failed to authorize surgeon:', error);
+                showAlert('Failed to authorize surgeon: ' + error.message, 'error');
+            }
+        }
+
+        async function loadHistory() {
+            if (!contract) {
+                const container = document.getElementById('historyContainer');
+                container.innerHTML = '<p>Please connect wallet and enter contract address to view history</p>';
+                return;
+            }
+
+            const container = document.getElementById('historyContainer');
+            container.innerHTML = '<p>Loading history...</p>';
+
+            try {
+                let historyHTML = '';
+                const currentSlotId = await getCurrentSlotId();
+
+                // Load last 10 slots
+                for (let i = Math.max(1, currentSlotId - 10); i < currentSlotId; i++) {
+                    try {
+                        const history = await contract.getSlotHistory(i);
+                        if (history[0]) { // slot assigned
+                            historyHTML += `
+                                <div class="history-item">
+                                    <strong>Slot ${i}</strong><br>
+                                    Assigned to: ${history[1].substring(0,6)}...${history[1].substring(38)}<br>
+                                    Urgency Level: ${history[2]}<br>
+                                    Created: ${new Date(history[3] * 1000).toLocaleString()}<br>
+                                    Assigned: ${new Date(history[4] * 1000).toLocaleString()}<br>
+                                    Total Requests: ${history[5]}
+                                </div>
+                            `;
+                        }
+                    } catch (e) {
+                        // Skip slots that don't exist
+                    }
+                }
+
+                container.innerHTML = historyHTML || '<p>No assignment history available</p>';
+            } catch (error) {
+                container.innerHTML = '<p>Failed to load history</p>';
+                console.error('Failed to load history:', error);
+            }
+        }
+
+        async function getCurrentSlotId() {
+            try {
+                const slotInfo = await contract.getCurrentSlotInfo();
+                return slotInfo[0].toNumber();
+            } catch {
+                return 1;
+            }
+        }
+
+        function showAlert(message, type) {
+            const alertsContainer = document.getElementById('alerts');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+
+            alertsContainer.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Auto-refresh every 30 seconds if contract is connected
+        setInterval(() => {
+            if (contract) {
+                loadContractInfo();
+            }
+        }, 30000);
+
+        // Initialize
+        updateConnectionStatus(false);
+
+        // Set current timestamp on load
+        document.getElementById('currentTimestamp').textContent = Math.floor(Date.now() / 1000);
+
+        // Check if ethers is loaded after page load
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                if (typeof ethers === 'undefined') {
+                    showAlert('Warning: Ethers.js library failed to load. Please check your internet connection and refresh the page.', 'error');
+                } else {
+                    console.log('Ethers.js loaded successfully, version:', ethers.version);
+                }
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
