@@ -10,6 +10,10 @@
 
 Confidential Surgery Scheduler is a blockchain-based smart contract system that enables privacy-preserving medical appointment scheduling. Using Zama's FHEVM (Fully Homomorphic Encryption Virtual Machine), sensitive patient data remains encrypted throughout the entire scheduling process, ensuring medical privacy while maintaining operational efficiency.
 
+Video: CONFIDENTIAL SURGERY SCHEDULER.mp4 https://streamable.com/qru9eg
+
+Live : https://confidential-surgery-scheduler.vercel.app/
+
 ### Key Features
 
 - **🔒 Privacy-First**: All sensitive patient data (patient IDs, urgency levels, surgery types) encrypted using FHE
